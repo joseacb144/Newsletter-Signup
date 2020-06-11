@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const request = require("request");
+const https = require("https");
 
 const app = express();
 
@@ -13,17 +14,69 @@ app.get("/", function(req,res){
   res.sendFile(__dirname + "/signup.html");
 })
 
+
+// The following is used to store the data given by the user.
 app.post("/",function(req,res){
 
-  var firstName = req.body.fName;
-  var lastName = req.body.lName;
-  var email = req.body.email;
+  const firstName = req.body.fName;
+  const lastName = req.body.lName;
+  const email = req.body.email;
 
-  console.log(firstName, lastName, email);
+  const data = {
+    members: [
+      {
+      email_address: email,
+      status: "subscribed",
+      merge_fields: {
+          FNAME: firstName,
+          LNAME: lastName
+        }
+      }
+    ]
+  }
+
+  const jsonData = JSON.stringify(data);
+
+  const url = "https://us10.api.mailchimp.com/3.0/lists/89875ccbf0";
+
+  const options = {
+    method: "POST",
+    auth: "jose1:63f15a7166467d12e4009ec81b5fe354-us10"
+  }
+
+  const request = https.request(url, options, function(response){
+
+    if (response.statusCode === 200){
+      res.sendFile(__dirname + "/success.html");
+    } else {
+      res.sendFile(__dirname + "/failure.html");
+    }
+
+    response.on("data", function(data){
+      console.log(JSON.parse(data));
+    })
+  })
+
+  request.write(jsonData);
+  request.end();
 
 })
 
+app.post("/failure", function(req,res){
+  res.redirect("/");
+})
 
-app.listen(3000, function(){
+
+
+// Port was changed from local (3000) to process.evn.PORT for heroku
+// process.evn.PORT || 3000 allows you to run the web app locally and on heroku
+app.listen(process.evn.PORT || 3000, function(){
   console.log("Server is running on port 3000.");
 })
+
+
+// API KEY
+// 63f15a7166467d12e4009ec81b5fe354-us10
+
+// List ID
+// 89875ccbf0
