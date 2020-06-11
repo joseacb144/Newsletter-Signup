@@ -41,7 +41,7 @@ app.post("/",function(req,res){
 
   const options = {
     method: "POST",
-    auth: "jose1:63f15a7166467d12e4009ec81b5fe354-us10"
+    auth: "jose1:" //API KEY NEEDED AFTER COLON!!!!!!!!!
   }
 
   const request = https.request(url, options, function(response){
@@ -73,10 +73,3 @@ app.post("/failure", function(req,res){
 app.listen(process.env.PORT || 3000, function(){
   console.log("Server is running on port 3000.");
 });
-
-
-// API KEY
-// 63f15a7166467d12e4009ec81b5fe354-us10
-
-// List ID
-// 89875ccbf0
